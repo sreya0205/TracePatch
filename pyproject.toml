@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "incidentpilot"
+version = "0.1.0"
+description = "Production Multi-Agent Root Cause Analysis (RCA) & Bug Reproduction Engine"
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [
+    { name = "IncidentPilot Team" }
+]
+dependencies = [
+    "fastapi>=0.111.0",
+    "pydantic>=2.7.0",
+    "langgraph>=0.1.0",
+    "langchain-core>=0.2.0",
+    "docker>=7.0.0",
+    "opentelemetry-api>=1.24.0",
+    "gitpython>=3.1.43",
+    "pytest>=8.2.0",
+    "uvicorn>=0.30.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.2.0",
+    "pytest-asyncio>=0.23.0",
+    "httpx>=0.27.0",
+    "streamlit>=1.35.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+]

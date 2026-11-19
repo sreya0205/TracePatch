@@ -1,0 +1,162 @@
+[
+  {
+    "id": "CASE-01",
+    "name": "ZeroDivisionError in pricing calculation",
+    "expected_error_class": "ZeroDivisionError",
+    "ground_truth_file": "services/pricing/calculator.py",
+    "ground_truth_culprit_lines": [42, 43],
+    "raw_logs": "2024-11-19T10:14:22Z [INFO] Received calculate_rate request for plan_id=enterprise user_id=98124\n2024-11-19T10:14:22Z [ERROR] Exception in worker process:\nTraceback (most recent call last):\n  File \"app/server.py\", line 88, in handle_request\n    res = dispatch_job(req)\n  File \"services/pricing/calculator.py\", line 42, in calculate_rate\n    discounted_val = raw_amount / volume_multiplier\nZeroDivisionError: division by zero"
+  },
+  {
+    "id": "CASE-02",
+    "name": "KeyError in missing JSON payload field",
+    "expected_error_class": "KeyError",
+    "ground_truth_file": "api/handlers/checkout.py",
+    "ground_truth_culprit_lines": [67, 68],
+    "raw_logs": "2024-11-19T11:02:15Z [INFO] Processing checkout webhook event_id=wh_88912\nTraceback (most recent call last):\n  File \"api/server.py\", line 120, in post\n    return checkout_handler.process(body)\n  File \"api/handlers/checkout.py\", line 67, in process\n    customer_id = body[\"customer_id\"]\nKeyError: 'customer_id'"
+  },
+  {
+    "id": "CASE-03",
+    "name": "TypeError unhandled NoneType in third-party API response",
+    "expected_error_class": "TypeError",
+    "ground_truth_file": "services/analytics/aggregator.py",
+    "ground_truth_culprit_lines": [105, 106],
+    "raw_logs": "2024-11-19T11:25:40Z [ERROR] Aggregation pipeline crashed during metric merge\nTraceback (most recent call last):\n  File \"workers/cron.py\", line 54, in run_aggregation\n    aggregate_metrics(account_id=\"acc_7712\")\n  File \"services/analytics/aggregator.py\", line 105, in aggregate_metrics\n    total_duration = base_latency + upstream_latency\nTypeError: unsupported operand type(s) for +: 'NoneType' and 'int'"
+  },
+  {
+    "id": "CASE-04",
+    "name": "IndexError off-by-one in pagination window",
+    "expected_error_class": "IndexError",
+    "ground_truth_file": "data/repositories/paginator.py",
+    "ground_truth_culprit_lines": [31, 32],
+    "raw_logs": "2024-11-19T12:00:19Z [ERROR] Uncaught exception in paginated cursor\nTraceback (most recent call last):\n  File \"api/views/items.py\", line 44, in get_page\n    return paginate_results(items, page=5, page_size=20)\n  File \"data/repositories/paginator.py\", line 31, in paginate_results\n    next_cursor = records[end_offset]\nIndexError: list index out of range"
+  },
+  {
+    "id": "CASE-05",
+    "name": "AttributeError missing method after object refactor",
+    "expected_error_class": "AttributeError",
+    "ground_truth_file": "services/billing/subscription.py",
+    "ground_truth_culprit_lines": [84, 85],
+    "raw_logs": "2024-11-19T12:44:02Z [CRITICAL] Billing recurring renewal failed\nTraceback (most recent call last):\n  File \"services/billing/renewal.py\", line 39, in renew_user\n    sub = account.get_active_subscription()\n  File \"services/billing/subscription.py\", line 84, in renew_user\n    status = account.get_active_subscription()\nAttributeError: 'BillingAccount' object has no attribute 'get_active_subscription'"
+  },
+  {
+    "id": "CASE-06",
+    "name": "ValueError invalid ISO timestamp parsing",
+    "expected_error_class": "ValueError",
+    "ground_truth_file": "utils/datetime_parser.py",
+    "ground_truth_culprit_lines": [19, 20],
+    "raw_logs": "2024-11-19T13:10:55Z [ERROR] Failed to ingest timestamp telemetry\nTraceback (most recent call last):\n  File \"ingestion/events.py\", line 60, in parse_event\n    dt = parse_iso_timestamp(event['timestamp'])\n  File \"utils/datetime_parser.py\", line 19, in parse_iso_timestamp\n    return datetime.fromisoformat(raw_str)\nValueError: time data '2024-11-19T99:99:99' does not match format"
+  },
+  {
+    "id": "CASE-07",
+    "name": "RecursionError circular dependency in graph resolution",
+    "expected_error_class": "RecursionError",
+    "ground_truth_file": "core/dependency_graph.py",
+    "ground_truth_culprit_lines": [58, 59],
+    "raw_logs": "2024-11-19T13:30:11Z [CRITICAL] Core graph solver stack overflow\nTraceback (most recent call last):\n  File \"core/resolver.py\", line 22, in resolve\n    return graph.resolve_node(root)\n  File \"core/dependency_graph.py\", line 58, in resolve_node\n    return [self.resolve_node(child) for child in node.children]\nRecursionError: maximum recursion depth exceeded"
+  },
+  {
+    "id": "CASE-08",
+    "name": "TimeoutError unhandled gateway timeout",
+    "expected_error_class": "TimeoutError",
+    "ground_truth_file": "clients/gateway_client.py",
+    "ground_truth_culprit_lines": [73, 74],
+    "raw_logs": "2024-11-19T14:02:44Z [ERROR] Payment gateway connection terminated\nTraceback (most recent call last):\n  File \"payments/processor.py\", line 51, in charge\n    return gateway.post_charge(payload)\n  File \"clients/gateway_client.py\", line 73, in post_charge\n    raise TimeoutError('Connection timed out to payment gateway')\nTimeoutError: Connection timed out to payment gateway"
+  },
+  {
+    "id": "CASE-09",
+    "name": "FileNotFoundError missing config asset in container",
+    "expected_error_class": "FileNotFoundError",
+    "ground_truth_file": "config/loader.py",
+    "ground_truth_culprit_lines": [25, 26],
+    "raw_logs": "2024-11-19T14:20:10Z [ERROR] Initialization aborted\nTraceback (most recent call last):\n  File \"app/entrypoint.py\", line 15, in bootstrap\n    cfg = load_configuration()\n  File \"config/loader.py\", line 25, in load_configuration\n    with open('/etc/secrets/config.json', 'r') as f:\nFileNotFoundError: [Errno 2] No such file or directory: '/etc/secrets/config.json'"
+  },
+  {
+    "id": "CASE-10",
+    "name": "PermissionError unprivileged file write attempt",
+    "expected_error_class": "PermissionError",
+    "ground_truth_file": "logger/audit.py",
+    "ground_truth_culprit_lines": [34, 35],
+    "raw_logs": "2024-11-19T14:45:00Z [CRITICAL] Security audit logging failed\nTraceback (most recent call last):\n  File \"security/middleware.py\", line 82, in log_access\n    audit.write_event(event)\n  File \"logger/audit.py\", line 34, in write_event\n    with open('/var/log/audit.log', 'a') as f:\nPermissionError: [Errno 13] Permission denied: '/var/log/audit.log'"
+  },
+  {
+    "id": "CASE-11",
+    "name": "MemoryError unbounded cache accumulation",
+    "expected_error_class": "MemoryError",
+    "ground_truth_file": "cache/lru_cache.py",
+    "ground_truth_culprit_lines": [50, 51],
+    "raw_logs": "2024-11-19T15:01:29Z [CRITICAL] Worker out of memory\nTraceback (most recent call last):\n  File \"services/indexer.py\", line 99, in index_documents\n    cache.store_batch(batch)\n  File \"cache/lru_cache.py\", line 50, in store_batch\n    raise MemoryError('cache capacity exceeded 512MB limit')\nMemoryError: cache capacity exceeded 512MB limit"
+  },
+  {
+    "id": "CASE-12",
+    "name": "RuntimeError concurrency dictionary mutation",
+    "expected_error_class": "RuntimeError",
+    "ground_truth_file": "state/session_manager.py",
+    "ground_truth_culprit_lines": [62, 63],
+    "raw_logs": "2024-11-19T15:20:00Z [ERROR] Session sweep thread crashed\nTraceback (most recent call last):\n  File \"state/janitor.py\", line 30, in sweep\n    manager.evict_expired()\n  File \"state/session_manager.py\", line 62, in evict_expired\n    for sid, sess in self.sessions.items():\nRuntimeError: dictionary changed size during iteration"
+  },
+  {
+    "id": "CASE-13",
+    "name": "ConnectionError unhandled HTTP 502 Bad Gateway",
+    "expected_error_class": "ConnectionError",
+    "ground_truth_file": "network/http_client.py",
+    "ground_truth_culprit_lines": [45, 46],
+    "raw_logs": "2024-11-19T15:40:12Z [ERROR] Remote call failed with bad gateway\nTraceback (most recent call last):\n  File \"services/order_service.py\", line 70, in sync_order\n    client.send_order(payload)\n  File \"network/http_client.py\", line 45, in send_order\n    raise ConnectionError('502 Bad Gateway upstream service unavailable')\nConnectionError: 502 Bad Gateway upstream service unavailable"
+  },
+  {
+    "id": "CASE-14",
+    "name": "JSONDecodeError malformed webhook payload",
+    "expected_error_class": "ValueError",
+    "ground_truth_file": "webhooks/receiver.py",
+    "ground_truth_culprit_lines": [28, 29],
+    "raw_logs": "2024-11-19T16:00:05Z [WARNING] Malformed webhook received\nTraceback (most recent call last):\n  File \"api/webhooks.py\", line 33, in handle_hook\n    parsed = receiver.parse_payload(raw_body)\n  File \"webhooks/receiver.py\", line 28, in parse_payload\n    raise ValueError('Expecting value: line 1 column 1 (char 0)')\nValueError: Expecting value: line 1 column 1 (char 0)"
+  },
+  {
+    "id": "CASE-15",
+    "name": "RuntimeError database connection pool exhaustion",
+    "expected_error_class": "RuntimeError",
+    "ground_truth_file": "database/pool.py",
+    "ground_truth_culprit_lines": [91, 92],
+    "raw_logs": "2024-11-19T16:15:33Z [CRITICAL] DB Pool exhausted\nTraceback (most recent call last):\n  File \"models/user.py\", line 40, in get_by_id\n    conn = pool.acquire()\n  File \"database/pool.py\", line 91, in acquire\n    raise RuntimeError('connection pool exhausted, max connections 20 reached')\nRuntimeError: connection pool exhausted, max connections 20 reached"
+  },
+  {
+    "id": "CASE-16",
+    "name": "ValueError schema validation failure in order quantity",
+    "expected_error_class": "ValueError",
+    "ground_truth_file": "schemas/orders.py",
+    "ground_truth_culprit_lines": [38, 39],
+    "raw_logs": "2024-11-19T16:35:10Z [ERROR] Validation failure on incoming order\nTraceback (most recent call last):\n  File \"api/orders.py\", line 52, in create_order\n    return validate_order(data)\n  File \"schemas/orders.py\", line 38, in validate_order\n    raise ValueError('quantity must be positive')\nValueError: quantity must be positive"
+  },
+  {
+    "id": "CASE-17",
+    "name": "re.error regex syntax invalid repetition",
+    "expected_error_class": "Exception",
+    "ground_truth_file": "filters/sanitizer.py",
+    "ground_truth_culprit_lines": [22, 23],
+    "raw_logs": "2024-11-19T16:50:22Z [ERROR] Regex compile failure in filter\nTraceback (most recent call last):\n  File \"filters/pipeline.py\", line 18, in apply_filters\n    compiled = sanitizer.build_regex(pattern)\n  File \"filters/sanitizer.py\", line 22, in build_regex\n    raise Exception('nothing to repeat at position 0')\nException: nothing to repeat at position 0"
+  },
+  {
+    "id": "CASE-18",
+    "name": "TypeError unhandled None in discount multiplier",
+    "expected_error_class": "TypeError",
+    "ground_truth_file": "services/pricing/discounts.py",
+    "ground_truth_culprit_lines": [55, 56],
+    "raw_logs": "2024-11-19T17:05:44Z [ERROR] Pricing discount computation failed\nTraceback (most recent call last):\n  File \"services/pricing/service.py\", line 81, in get_price\n    return apply_discounts(price, promo_code)\n  File \"services/pricing/discounts.py\", line 55, in apply_discounts\n    discount_total = base_price * discount_multiplier\nTypeError: unsupported operand type(s) for *: 'float' and 'NoneType'"
+  },
+  {
+    "id": "CASE-19",
+    "name": "PermissionError JWT Token signature has expired",
+    "expected_error_class": "PermissionError",
+    "ground_truth_file": "auth/jwt_validator.py",
+    "ground_truth_culprit_lines": [48, 49],
+    "raw_logs": "2024-11-19T17:15:19Z [WARNING] Auth rejection on expired JWT\nTraceback (most recent call last):\n  File \"auth/guard.py\", line 36, in authenticate_request\n    return validator.verify(token)\n  File \"auth/jwt_validator.py\", line 48, in verify\n    raise PermissionError('Token signature has expired (exp)')\nPermissionError: Token signature has expired (exp)"
+  },
+  {
+    "id": "CASE-20",
+    "name": "AssertionError transfer balance delta mismatch",
+    "expected_error_class": "AssertionError",
+    "ground_truth_file": "ledger/transfers.py",
+    "ground_truth_culprit_lines": [71, 72],
+    "raw_logs": "2024-11-19T17:28:01Z [CRITICAL] Ledger invariant assertion failure\nTraceback (most recent call last):\n  File \"ledger/service.py\", line 94, in execute_transfer\n    post_journal_entries(transfer_id)\n  File \"ledger/transfers.py\", line 71, in post_journal_entries\n    assert credit_sum == debit_sum, 'Transfer balance delta does not equal ledger debit'\nAssertionError: Transfer balance delta does not equal ledger debit"
+  }
+]
